@@ -77,15 +77,19 @@ atomcode login      # 浏览器授权一次
 
 要求：DSH ≥ `0.1.2-rc.1`，Node `^22.19.0 || >=24.0.0`。**纯 JS，无需构建。**
 
+1. 把仓库放到任意目录（或 `npm pack` 成 tarball）；
+2. 在 DSH 里用 `plugin_manager` 的 `install_bundle`，`target` 指向该目录 / tarball；
+3. 在 Plugins 页启用 `dsh-atomcode`；
+4. 首次装完**刷新一次页面**（浏览器半在启动时组装，宿主半不用重启）。
+
+登录：
+
 ```bash
-# 1. 让 DSH 认识这个包（指向本地目录或已安装的包名）
-#    plugin_manager: action=install_bundle, target=<绝对路径>
-# 2. 在 Plugins 页启用一次
-# 3. 浏览器端是启动时组装的，首次装完刷新一次页面
+atomcode login          # 装过 AtomCode CLI 的话，复用它的 auth.toml 即可
+# 或让插件自己走 OAuth（面板上的「登录」按钮 / POST /api/atomcode/login）
 ```
 
-也可以先 `npm pack` 打成 tarball 再 `install_bundle`。宿主侧（HTTP 路由 / provider）
-改完用「禁用 → 启用」即可热重载，不需要重启 DSH。
+宿主侧（HTTP 路由 / provider）改完用「禁用 → 启用」热重载，不必重启 DSH。
 
 ---
 
