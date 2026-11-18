@@ -1,0 +1,5 @@
+# dsh-atomcode 的 loader patch：插入一条 Host 插件行。
+# 安装后由 DSH 的 profile 加载，provider route 为 `atomcode`。
+- insert:
+    - id: llm-atomcode
+      name: dsh-atomcode
