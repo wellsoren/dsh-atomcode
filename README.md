@@ -4,8 +4,7 @@
 
 把 **AtomGit AtomCode CodingPlan** 里的模型接进 [DeepSeek Harness](https://github.com/deepseek-ai)（DSH）。
 
-装好之后，模型选择器里多出一个 provider **AtomGit AtomCode**，聊天窗口照常用；左侧图标栏还会多一格
-**AtomCode**，一眼看到登录状态、套餐额度和近 60 天用量。
+装好之后，模型选择器里多出一个 provider **AtomGit AtomCode**，聊天窗口照常用；左侧图标栏还会多一格 **AtomCode**，一眼看到登录状态、套餐额度和近 60 天用量。
 
 - 仓库：<https://github.com/wellsoren/dsh-atomcode>
 - 内部实现（签名算法、接口、排错）：[Instructions.md](Instructions.md)
@@ -14,18 +13,13 @@
 
 ## 功能简介
 
-- **一个 provider**：`atomcode`，模型由 CodingPlan 服务端下发（`models-v2`），只注册当前套餐可用的条目。
-  当前账号所见为 `qwen3.8-27b`（262k 上下文 / 32k 输出 / 视觉 / low·medium·xhigh）与
-  `glm5.3-flash`（512k / 16k / 视觉 / low·high）。
-- **登录态复用**：直接读 AtomCode 官方 CLI 的 `~/.atomcode/auth.toml`；没装 CLI 也能在面板里点「登录」
-  走一遍 OAuth，结果写回同一个文件。token 快过期时自动用 `refresh_token` 续期并轮换写回。
-- **签名代理**：AtomGit 网关要求 `X-AtomCode-*` 请求签名（对 body 原始字节做 HMAC），插件起一个只监听
-  `127.0.0.1` 的回环代理完成签名与转发，对 DSH 来说它就是普通 OpenAI 兼容端点。
+- **一个 provider**：`atomcode`，模型由 CodingPlan 服务端下发（`models-v2`），只注册当前套餐可用的条目。当前账号所见为 `qwen3.8-27b`（262k 上下文 / 32k 输出 / 视觉 / low·medium·xhigh）与 `glm5.3-flash`（512k / 16k / 视觉 / low·high）。
+- **登录态复用**：直接读 AtomCode 官方 CLI 的 `~/.atomcode/auth.toml`；没装 CLI 也能在面板里点「登录」走一遍 OAuth，结果写回同一个文件。token 快过期时自动用 `refresh_token` 续期并轮换写回。
+- **签名代理**：AtomGit 网关要求 `X-AtomCode-*` 请求签名（对 body 原始字节做 HMAC），插件起一个只监听 `127.0.0.1` 的回环代理完成签名与转发，对 DSH 来说它就是普通 OpenAI 兼容端点。
 - **模型热更新**：启动时拉一次，之后每小时刷新；服务端不可用时回退到内置种子，聊天不受影响。
 - **按模型开关**：`enabledModels` 留空是全开，填了就只暴露列出的模型。
 - **侧边栏面板**：登录态、套餐、5 小时额度窗口、近 60 天按天/分模型用量，支持刷新、领取套餐、登录、退出。
-- **多模态与推理档位**：服务端声明 `supports_vision` 的模型自动开图像输入；`reasoning_effort_levels`
-  原样映射到 DSH 的思考档位，没声明的档位显式钉成不支持。
+- **多模态与推理档位**：服务端声明 `supports_vision` 的模型自动开图像输入；`reasoning_effort_levels` 原样映射到 DSH 的思考档位，没声明的档位显式钉成不支持。
 
 ## 安装
 
@@ -48,7 +42,7 @@ atomcode login          # 已经装了 AtomCode CLI：插件直接复用它的 a
 
 ## 侧边栏面板
 
-左侧图标栏的 **AtomCode**（排在 CodeArts 之后）打开后：
+左侧图标栏的 **AtomCode** 打开后：
 
 | 区块 | 内容 |
 | --- | --- |
@@ -67,31 +61,25 @@ atomcode login          # 已经装了 AtomCode CLI：插件直接复用它的 a
 - 只代理 `/chat/completions`；`/responses`、embeddings、rerank 还没接。
 - 单账号：一个 DSH 进程一套登录态，没有多账号轮换。
 - 用量只读：数据来自 `status-v2` / `usage`，不在本地记账。
-- 签名盐里包含客户端版本：AtomCode 换大版本（改签名算法或路径）时，需要同步 `clientVersion`
-  或更新签名实现。
-- 与 CLI 共享 `auth.toml`：AtomGit 的 refresh 会轮换 `refresh_token`，两边以最后写入的为准，
-  极端情况下另一侧需要重新登录。
+- 签名盐里包含客户端版本：AtomCode 换大版本（改签名算法或路径）时，需要同步 `clientVersion` 或更新签名实现。
+- 与 CLI 共享 `auth.toml`：AtomGit 的 refresh 会轮换 `refresh_token`，两边以最后写入的为准，极端情况下另一侧需要重新登录。
 - 面板是浏览器端组件，首次安装或改动 `dsh.client` 后要刷新页面才出现。
 
 ## 隐私
 
-- **凭证不出本机**：`access_token` / `refresh_token` 只存在 `~/.atomcode/auth.toml`，插件不另存副本，
-  也不发往任何第三方；所有出网请求只到 `acs.atomgit.com`、`api.gitcode.com`、`llm-api.atomgit.com`。
-- **回环代理**：只监听 `127.0.0.1`，要求 `Authorization: Bearer <每进程随机口令>`，并校验 `Host`；
-  `/api/atomcode/*` 额外校验来源必须是回环地址。
+- **凭证不出本机**：`access_token` / `refresh_token` 只存在 `~/.atomcode/auth.toml`，插件不另存副本，也不发往任何第三方；所有出网请求只到 `acs.atomgit.com`、`api.gitcode.com`、`llm-api.atomgit.com`。
+- **回环代理**：只监听 `127.0.0.1`，要求 `Authorization: Bearer <每进程随机口令>`，并校验 `Host`；`/api/atomcode/*` 额外校验来源必须是回环地址。
 - **无遥测**：插件不收集、不上报任何使用数据。
-- **仓库干净**：不含真实 token、用户 id、邮箱或绝对路径；测试用 fixture，抓包校验的凭证从环境变量读。
-  `.gitignore` 已排除 `auth.toml` 与抓包日志。
+- **仓库干净**：不含真实 token、用户 id、邮箱或绝对路径；测试用 fixture，抓包校验的凭证从环境变量读。`.gitignore` 已排除 `auth.toml` 与抓包日志。
 
 ## 免责声明
 
 本项目是**非官方**的第三方插件，与 AtomGit、AtomCode、DeepSeek 均无隶属或背书关系。
 
-- 它复用 AtomCode 客户端的公开协议行为（登录、CodingPlan 接口、请求签名）。这些行为可能随版本变化，
-  升级后插件可能失效。
-- 使用本插件产生的账号状态、额度消耗、登录态轮换等后果由使用者自行承担；请遵守 AtomGit / AtomCode
-  的服务条款。
-- 软件按「现状」提供，不附带任何明示或暗示的担保；因使用本软件造成的任何直接或间接损失，作者不承担责任。
+- 它复用 AtomCode 客户端的公开协议行为（登录、CodingPlan 接口、请求签名）。这些行为可能随版本变化，升级后插件可能失效。
+- 本插件仅供个人学习研究，请勿用于商业转售或任何超出个人合理使用的场景。使用即表示你自行承担账号被限制、额度损失、服务中断等一切后果；请遵守 AtomGit / AtomCode 的服务条款。
+
+插件按「现状」提供，不附带任何明示或暗示的担保；因使用本软件造成的任何直接或间接损失，作者不承担责任。
 
 ## 致谢
 
