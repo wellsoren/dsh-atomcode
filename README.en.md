@@ -42,15 +42,15 @@ After editing `lib/*.js`, disable and re-enable the plugin on the Plugins page t
 
 The **AtomCode** icon in the left rail opens:
 
-| Section | Contents |
-| --- | --- |
-| Account | Login state, `name · @username`, `auth.toml` path, token expiry |
-| Plan | `CodingPlan Lite-体验版` / Pro name, claimed → expiry dates, days left, tier |
-| This window | `calls_used / call_limit`, token usage, reset countdown for the rolling **5-hour** window |
-| Quota windows | Every enabled entry in `rate_limit_windows`, including its reset hint |
-| Last 60 days | Daily bar chart (hover for calls/tokens) plus per-model share, call count and tokens |
-| Models | Context window, output cap, vision support, reasoning levels |
-| Actions | Refresh / Claim plan / Sign in / Sign out |
+| Section       | Contents                                                                                  |
+| ------------- | ----------------------------------------------------------------------------------------- |
+| Account       | Login state, `name · @username`, `auth.toml` path, token expiry                           |
+| Plan          | `CodingPlan Lite-体验版` / Pro name, claimed → expiry dates, days left, tier                 |
+| This window   | `calls_used / call_limit`, token usage, reset countdown for the rolling **5-hour** window |
+| Quota windows | Every enabled entry in `rate_limit_windows`, including its reset hint                     |
+| Last 60 days  | Daily bar chart (hover for calls/tokens) plus per-model share, call count and tokens      |
+| Models        | Context window, output cap, vision support, reasoning levels                              |
+| Actions       | Refresh / Claim plan / Sign in / Sign out                                                 |
 
 Data is polled every 60 seconds and countdowns tick every 30 seconds. Requests only go to the loopback endpoints `/api/atomcode/*`.
 
@@ -76,8 +76,7 @@ This is an **unofficial** third-party plugin, not affiliated with or endorsed by
 
 - It relies on the observable protocol behaviour of the AtomCode client (login, CodingPlan endpoints, request signing). That behaviour may change between releases, and the plugin may stop working after an upgrade.
 - This plugin is intended for personal learning and research only. Do not use it for commercial resale or any scenarios beyond reasonable personal use. By using it, you assume all risks, including account restrictions, quota loss, service interruptions, and any other consequences. Please comply with the terms of service of AtomGit / AtomCode.
-
-The software is provided "as is", without warranty of any kind. The authors are not liable for any direct or indirect damage arising from its use.
+- The software is provided "as is", without warranty of any kind. The authors are not liable for any direct or indirect damage arising from its use.
 
 ## Acknowledgements
 
