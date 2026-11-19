@@ -44,6 +44,8 @@ atomcode login          # 已经装了 AtomCode CLI：插件直接复用它的 a
 
 左侧图标栏的 **AtomCode** 打开后：
 
+![AtomCode 侧边栏面板](docs/sidebar-panel.png)
+
 | 区块       | 内容                                                     |
 | -------- | ------------------------------------------------------ |
 | 账号       | 登录状态、`name · @username`、`auth.toml` 路径、token 到期        |

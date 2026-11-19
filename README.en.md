@@ -42,6 +42,8 @@ After editing `lib/*.js`, disable and re-enable the plugin on the Plugins page t
 
 The **AtomCode** icon in the left rail opens:
 
+![AtomCode sidebar panel](docs/sidebar-panel.png)
+
 | Section       | Contents                                                                                  |
 | ------------- | ----------------------------------------------------------------------------------------- |
 | Account       | Login state, `name · @username`, `auth.toml` path, token expiry                           |
