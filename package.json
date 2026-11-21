@@ -2,7 +2,7 @@
   "name": "dsh-atomcode",
   "displayName": "DSH AtomCode Connect",
   "description": "把 AtomGit AtomCode 的 CodingPlan 模型接进 DeepSeek Harness：复用 `atomcode login` 的登录态，本机回环代理负责网关请求签名。",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "private": true,
   "type": "module",
   "main": "lib/index.js",
@@ -51,7 +51,7 @@
     "@earendil-works/pi-ai": "*"
   },
   "scripts": {
-    "test": "node --test test/sign.test.mjs",
+    "test": "node --test test/sign.test.mjs test/access.test.mjs",
     "smoke": "node test/smoke-shim.mjs",
     "smoke:client": "node test/smoke-client.mjs"
   },
