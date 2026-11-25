@@ -47,7 +47,7 @@ sig         = "v1:" ++ hex(HMAC-SHA256(signing_key, canonical))
 - `body` 必须是**真正发出去的那串字节**，不能重新序列化（顺序/空格都会让签名失效）；
 - `nonce` 16 字节随机，`ts` 是 Unix 秒，`client_version` 目前是 `5.2.7`。
 
-`lib/sign.js` 里的实现已用 7 条从官方 CLI 抓下来的真实请求逐字节核对（`test/verify-capture.mjs`），
+`lib/sign.js` 里的实现已用 7 条从官方 CLI 抓下来的真实请求逐字节核对（校验脚本是本地开发工具，不入库），
 并用它直接打通了线上网关（HTTP 200 + SSE）。
 
 ### 密钥与安全边界
@@ -236,13 +236,9 @@ lib/
   index.js       # 插件入口：注册 adapter、定时刷新、HTTP 路由
   client/
     index.js     # 浏览器半：侧边栏图标 + 主面板（手写 CJS bundle）
-test/
-  sign.test.mjs      # 固定向量 + 解析用例
-  auth-file.test.mjs # auth.toml 原子写 / 0600 / purge / 环境变量覆盖
-  smoke-shim.mjs     # 代理 → 真网关 的端到端冒烟
-  smoke-client.mjs   # 浏览器半的接线冒烟（槽位注册，不渲染 DOM）
-  verify-capture.mjs # 用真实抓包校验签名实现
 ```
+
+测试与冒烟脚本（`npm test` / `npm run smoke`）放在本地 `test/` 目录，按 `.gitignore` 不入库。
 
 ## 已知限制
 

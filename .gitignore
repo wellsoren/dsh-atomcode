@@ -3,6 +3,9 @@ node_modules/
 *.log
 *.tgz
 
+# 测试与冒烟脚本只在本地开发用，不入库
+test/
+
 # AtomCode / DSH 的本地状态
 auth.toml
 capture-log.jsonl
