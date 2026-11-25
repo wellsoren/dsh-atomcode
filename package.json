@@ -51,7 +51,7 @@
     "@earendil-works/pi-ai": "*"
   },
   "scripts": {
-    "test": "node --test test/sign.test.mjs test/access.test.mjs",
+    "test": "node --test test/sign.test.mjs test/access.test.mjs test/auth-file.test.mjs",
     "smoke": "node test/smoke-shim.mjs",
     "smoke:client": "node test/smoke-client.mjs"
   },

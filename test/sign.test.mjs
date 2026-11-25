@@ -31,6 +31,7 @@ test('签名向量（与独立实现逐字节一致）', () => {
     userId: 'user-123',
     timestamp: 1_700_000_000,
     nonce: Buffer.from([...Array(16).keys()]),
+    version: '5.2.7', // 显式固定：默认值可被 ATOMCODE_CLIENT_VERSION 覆盖，向量不能随之漂移
   })
   assert.equal(sig, 'v1:cf696cb3f572d744f646dfbd10c6b81b09a049187dd915d518776bbe05554839')
   assert.equal(headers['x-atomcode-alg'], '1')

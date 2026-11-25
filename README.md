@@ -65,6 +65,7 @@ atomcode login          # 已经装了 AtomCode CLI：插件直接复用它的 a
 - 用量只读：数据来自 `status-v2` / `usage`，不在本地记账。
 - 签名盐里包含客户端版本：AtomCode 换大版本（改签名算法或路径）时，需要同步 `clientVersion` 或更新签名实现。
 - 与 CLI 共享 `auth.toml`：AtomGit 的 refresh 会轮换 `refresh_token`，两边以最后写入的为准，极端情况下另一侧需要重新登录。
+- 面板的「退出登录」会删除这份共用的 `auth.toml`，所以 CLI 也会退出并需要重新登录；不想影响 CLI 就不要点这个按钮。
 - 面板是浏览器端组件，首次安装或改动 `dsh.client` 后要刷新页面才出现。
 
 ## 隐私
@@ -73,6 +74,7 @@ atomcode login          # 已经装了 AtomCode CLI：插件直接复用它的 a
 - **回环代理**：只监听 `127.0.0.1`，要求 `Authorization: Bearer <每进程随机口令>`，并校验 `Host`；`/api/atomcode/*` 额外校验来源必须是回环地址。
 - **无遥测**：插件不收集、不上报任何使用数据。
 - **仓库干净**：不含真实 token、用户 id、邮箱或绝对路径；测试用 fixture，抓包校验的凭证从环境变量读。`.gitignore` 已排除 `auth.toml` 与抓包日志。
+- **内置的是协议常量**：`lib/sign.js` 里的 `MASTER_KEY` 来自官方客户端的签名协议，只用于证明"这是 AtomCode 客户端"，不是你的账号密钥，也反推不出 token；它可以用 `ATOMCODE_MASTER_KEY` 覆盖，官方轮换时无需等发版。
 
 ## 免责声明
 

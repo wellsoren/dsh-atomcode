@@ -50,6 +50,19 @@ sig         = "v1:" ++ hex(HMAC-SHA256(signing_key, canonical))
 `lib/sign.js` 里的实现已用 7 条从官方 CLI 抓下来的真实请求逐字节核对（`test/verify-capture.mjs`），
 并用它直接打通了线上网关（HTTP 200 + SSE）。
 
+### 密钥与安全边界
+
+- `MASTER_KEY` 是**客户端协议常量**，随官方二进制分发，不是用户密钥。它能证明的只是
+  "调用方实现了 AtomCode 签名协议"，不带来账号权限：网关仍然校验 `Authorization`，
+  派生密钥绑定 `sha256(token) + user_id`，没有 token 既不能反推也不能冒充别人。
+- 代价是客户端身份校验（attestation）没有秘密可言——任何第三方客户端都能签出同样的头。
+  这是"把对称密钥放进客户端"这一设计的固有限制，不是本插件引入的。
+- 签名**不防重放**：派生密钥按 `floor(ts / 3600)` 分桶，nonce 只进签名串、不进密钥。
+  同一小时内抓到的完整请求可原样重发；要防只能由网关侧缓存 nonce / 限制 ts 偏移。
+- 两处默认值都可用环境变量覆盖，供应方轮换时不用改代码、不用发版：
+  `ATOMCODE_MASTER_KEY`（32 字节 hex，长度不对会直接报错）、
+  `ATOMCODE_CLIENT_VERSION`（默认 `5.2.7`）。
+
 ---
 
 ## 登录态来自哪里
@@ -203,6 +216,7 @@ settings.section   id=dsh-atomcode, order=60   → 设置左侧入口（同一�
 | `403 model is not enabled for codingplan 'Lite-beta'` | 该模型不在当前套餐里；`/api/atomcode/status` 看 `planAvailable` |
 | `models-v2` 400 `Required request parameter 'plan_type'` | `planType` 为空且 `status-v2` 没读到；手动配 `planType` |
 | 刷新 token 后 CLI 掉登录 | 正常：AtomGit 会轮换 `refresh_token`，两边共用 `auth.toml`，以最后写入的为准 |
+| 面板点「退出登录」后 CLI 也掉登录 | 预期行为：会删除共用的 `auth.toml`，CLI 需要重新登录；不想影响 CLI 就不要点这个按钮 |
 | 模型列表是空的 | 看 `/api/atomcode/status` 的 `lastError` / `modelsSource`（`server` 还是 `fallback`） |
 
 调试日志：设 `DSH_ATOMCODE_DEBUG=1` 启动 DSH，插件会往 stderr 打 `[dsh-atomcode] ...`。
@@ -224,6 +238,7 @@ lib/
     index.js     # 浏览器半：侧边栏图标 + 主面板（手写 CJS bundle）
 test/
   sign.test.mjs      # 固定向量 + 解析用例
+  auth-file.test.mjs # auth.toml 原子写 / 0600 / purge / 环境变量覆盖
   smoke-shim.mjs     # 代理 → 真网关 的端到端冒烟
   smoke-client.mjs   # 浏览器半的接线冒烟（槽位注册，不渲染 DOM）
   verify-capture.mjs # 用真实抓包校验签名实现
@@ -234,7 +249,9 @@ test/
 - 只代理 `/chat/completions`；`/responses`、embeddings、rerank 都还没接。
 - 一个进程一套登录态；多账号轮换没做（AtomCode 官方 CLI 的 `account` 概念也还没搬过来）。
 - 用量/额度只读展示（来自 `status-v2`），不做本地记账。
-- 网关目前把客户端版本算进签名盐，换大版本时需要同步 `clientVersion`。
+- 网关目前把客户端版本算进签名盐，换大版本时需要同步 `clientVersion`（或设 `ATOMCODE_CLIENT_VERSION`）。
+- 面板的「退出登录」删的是与 CLI 共用的 `auth.toml`；正在运行的 CLI 可能把文件重新写回来。
+- 签名不防重放（见上文「密钥与安全边界」），只能由网关侧修。
 
 ## 隐私
 
