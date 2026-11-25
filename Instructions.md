@@ -238,7 +238,7 @@ lib/
     index.js     # 浏览器半：侧边栏图标 + 主面板（手写 CJS bundle）
 ```
 
-测试与冒烟脚本（`npm test` / `npm run smoke`）放在本地 `test/` 目录，按 `.gitignore` 不入库。
+测试与冒烟脚本放在本地 `test/` 目录，按 `.gitignore` 不入库；需要时直接 `node --test "test/*.test.mjs"`，或单独 `node test/smoke-shim.mjs`。
 
 ## 已知限制
 
